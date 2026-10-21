@@ -1,0 +1,666 @@
+// HomeVista Ke — database schema (PostgreSQL)
+// Money is stored as whole Kenya shillings (Int). Times are UTC.
+
+generator client {
+  provider = "prisma-client-js"
+}
+
+datasource db {
+  provider = "postgresql"
+  url      = env("DATABASE_URL")
+}
+
+// ───────────────────────────── Accounts ─────────────────────────────
+
+enum Role {
+  USER   // property seeker
+  LISTER // landlord, agent, realtor, company, developer
+  ADMIN  // super admin or staff admin (see User.adminPermissions)
+}
+
+enum AccountStatus {
+  ACTIVE
+  SUSPENDED
+  BANNED
+}
+
+model User {
+  id               String        @id @default(cuid())
+  name             String
+  email            String        @unique
+  emailVerified    Boolean       @default(false)
+  phone            String?       @unique // 2547XXXXXXXX
+  phoneVerified    Boolean       @default(false)
+  passwordHash     String?
+  googleId         String?       @unique
+  avatarUrl        String?
+  role             Role          @default(USER)
+  isSuperAdmin     Boolean       @default(false)
+  adminPermissions String[]      @default([]) // staff admins only; see src/lib/permissions.ts
+  status           AccountStatus @default(ACTIVE)
+  statusReason     String?
+  createdAt        DateTime      @default(now())
+  lastLoginAt      DateTime?
+
+  lister        ListerProfile?
+  sessions      Session[]
+  favourites    Favourite[]
+  unlocks       Unlock[]
+  payments      Payment[]
+  reviews       Review[]
+  savedSearches SavedSearch[]
+  notifications Notification[]
+  reports       Report[]
+  messagesSent  Message[]
+  activity      ActivityLog[]
+
+  @@index([role])
+  @@index([createdAt])
+}
+
+model Session {
+  tokenHash String   @id
+  userId    String
+  user      User     @relation(fields: [userId], references: [id], onDelete: Cascade)
+  expiresAt DateTime
+  ip        String?
+  userAgent String?
+  createdAt DateTime @default(now())
+
+  @@index([userId])
+}
+
+model OtpCode {
+  id         String    @id @default(cuid())
+  phone      String
+  codeHash   String
+  purpose    String // "verify_phone"
+  attempts   Int       @default(0)
+  expiresAt  DateTime
+  consumedAt DateTime?
+  createdAt  DateTime  @default(now())
+
+  @@index([phone, purpose])
+}
+
+model RateBucket {
+  key     String   @id
+  count   Int
+  resetAt DateTime
+}
+
+// ───────────────────────────── Listers & KYC ─────────────────────────────
+
+enum ListerType {
+  LANDLORD
+  AGENT
+  REALTOR
+  COMPANY
+  DEVELOPER
+}
+
+enum KycStatus {
+  NOT_SUBMITTED
+  PENDING
+  UNDER_REVIEW
+  APPROVED
+  REJECTED
+  RESUBMIT
+}
+
+model ListerProfile {
+  id                 String     @id @default(cuid())
+  userId             String     @unique
+  user               User       @relation(fields: [userId], references: [id], onDelete: Cascade)
+  type               ListerType
+  displayName        String
+  slug               String     @unique
+  bio                String?
+  phone              String // contact number shown after unlock
+  whatsapp           String?
+  email              String // contact email shown after unlock
+  website            String?
+  logoUrl            String?
+  kycStatus          KycStatus  @default(NOT_SUBMITTED)
+  verified           Boolean    @default(false) // the gold badge
+  verifiedAt         DateTime?
+  badgeRevokedReason String?
+  subscriptionEndsAt DateTime? // listings are public only while this is in the future
+  createdAt          DateTime   @default(now())
+
+  listings       Property[]
+  kycSubmissions KycSubmission[]
+  subscriptions  Subscription[]
+  messages       Message[]
+  realtor        Realtor?
+
+  @@index([verified])
+  @@index([subscriptionEndsAt])
+}
+
+model KycSubmission {
+  id                String     @id @default(cuid())
+  listerId          String
+  lister            ListerProfile @relation(fields: [listerId], references: [id], onDelete: Cascade)
+  status            KycStatus  @default(PENDING)
+  fullName          String
+  idType            String // NATIONAL_ID | PASSPORT
+  idNumber          String
+  phone             String
+  email             String
+  address           String
+  // Storage keys in the PRIVATE bucket. Never exposed publicly; streamed to admins only.
+  idFrontKey        String
+  idBackKey         String
+  selfieKey         String
+  businessCertKey   String?
+  kraPin            String?
+  kraPinKey         String?
+  earbNumber        String?
+  ownershipProofKey String?
+  reviewNote        String? // rejection / resubmission reason shown to the lister
+  reviewedById      String?
+  reviewedAt        DateTime?
+  createdAt         DateTime   @default(now())
+
+  @@index([status, createdAt])
+  @@index([listerId])
+}
+
+// ───────────────────────────── Taxonomy ─────────────────────────────
+
+model PropertyType {
+  id        String     @id @default(cuid())
+  name      String     @unique
+  slug      String     @unique
+  icon      String     @default("home") // lucide icon name
+  sortOrder Int        @default(0)
+  active    Boolean    @default(true)
+  properties Property[]
+}
+
+model Amenity {
+  id         String     @id @default(cuid())
+  name       String     @unique
+  slug       String     @unique
+  icon       String     @default("check")
+  sortOrder  Int        @default(0)
+  active     Boolean    @default(true)
+  properties Property[] @relation("PropertyAmenities")
+}
+
+/// Curated collections ("Luxury Homes", "Gated Communities", ...) a listing can belong to.
+model Category {
+  id          String     @id @default(cuid())
+  name        String     @unique
+  slug        String     @unique
+  description String?
+  imageUrl    String?
+  sortOrder   Int        @default(0)
+  active      Boolean    @default(true)
+  properties  Property[] @relation("PropertyCategories")
+}
+
+model County {
+  id         String     @id @default(cuid())
+  name       String     @unique
+  slug       String     @unique
+  lat        Float
+  lng        Float
+  imageUrl   String?
+  popular    Boolean    @default(false)
+  towns      Town[]
+  properties Property[]
+}
+
+model Town {
+  id         String     @id @default(cuid())
+  countyId   String
+  county     County     @relation(fields: [countyId], references: [id], onDelete: Cascade)
+  name       String
+  slug       String
+  lat        Float
+  lng        Float
+  properties Property[]
+
+  @@unique([countyId, slug])
+}
+
+// ───────────────────────────── Properties ─────────────────────────────
+
+enum Purpose {
+  SALE
+  RENT
+  SHORT_STAY
+  OFF_PLAN
+}
+
+enum PricePeriod {
+  TOTAL
+  MONTH
+  NIGHT
+  WEEK
+  YEAR
+}
+
+enum ListingStatus {
+  DRAFT
+  PENDING // awaiting admin approval
+  ACTIVE
+  PAUSED
+  REJECTED
+  REMOVED
+}
+
+enum SizeUnit {
+  SQFT
+  SQM
+  ACRES
+}
+
+model Property {
+  id            String        @id @default(cuid())
+  slug          String        @unique
+  listerId      String
+  lister        ListerProfile @relation(fields: [listerId], references: [id], onDelete: Cascade)
+  title         String
+  description   String
+  purpose       Purpose
+  typeId        String
+  type          PropertyType  @relation(fields: [typeId], references: [id])
+  price         Int
+  pricePeriod   PricePeriod   @default(TOTAL)
+  countyId      String
+  county        County        @relation(fields: [countyId], references: [id])
+  townId        String?
+  town          Town?         @relation(fields: [townId], references: [id])
+  estate        String?
+  // Exact location — LOCKED until the viewer pays to unlock.
+  address       String?
+  lat           Float?
+  lng           Float?
+  // Public approximate position (offset ~0.5–1km) used for map browsing.
+  approxLat     Float?
+  approxLng     Float?
+  bedrooms      Int?
+  bathrooms     Int?
+  size          Float?
+  sizeUnit      SizeUnit      @default(SQFT)
+  furnished     Boolean       @default(false)
+  videoUrl      String?
+  tourUrl       String?
+  titleDeed     Boolean? // land / sale only
+  availableFrom DateTime?
+  status        ListingStatus @default(PENDING)
+  statusNote    String?
+  featured      Boolean       @default(false)
+  featuredRank  Int           @default(0)
+  views         Int           @default(0)
+  unlockCount   Int           @default(0)
+  ratingAvg     Float         @default(0)
+  ratingCount   Int           @default(0)
+  publishedAt   DateTime?
+  createdAt     DateTime      @default(now())
+  updatedAt     DateTime      @updatedAt
+
+  images     PropertyImage[]
+  amenities  Amenity[]       @relation("PropertyAmenities")
+  categories Category[]      @relation("PropertyCategories")
+  favourites Favourite[]
+  unlocks    Unlock[]
+  reviews    Review[]
+  reports    Report[]
+  payments   Payment[]
+  viewDays   PropertyViewDay[]
+  messages   Message[]
+
+  @@index([status, purpose])
+  @@index([countyId])
+  @@index([typeId])
+  @@index([price])
+  @@index([listerId])
+  @@index([createdAt])
+}
+
+model PropertyImage {
+  id         String   @id @default(cuid())
+  propertyId String
+  property   Property @relation(fields: [propertyId], references: [id], onDelete: Cascade)
+  url        String
+  alt        String?
+  sortOrder  Int      @default(0)
+
+  @@index([propertyId, sortOrder])
+}
+
+/// Daily view counters for lister and admin analytics charts.
+model PropertyViewDay {
+  propertyId String
+  property   Property @relation(fields: [propertyId], references: [id], onDelete: Cascade)
+  day        DateTime @db.Date
+  count      Int      @default(0)
+
+  @@id([propertyId, day])
+}
+
+model Favourite {
+  userId     String
+  user       User     @relation(fields: [userId], references: [id], onDelete: Cascade)
+  propertyId String
+  property   Property @relation(fields: [propertyId], references: [id], onDelete: Cascade)
+  createdAt  DateTime @default(now())
+
+  @@id([userId, propertyId])
+}
+
+model SavedSearch {
+  id             String    @id @default(cuid())
+  userId         String
+  user           User      @relation(fields: [userId], references: [id], onDelete: Cascade)
+  name           String
+  query          String // URL query string of the search page
+  alerts         Boolean   @default(true)
+  lastNotifiedAt DateTime  @default(now())
+  createdAt      DateTime  @default(now())
+
+  @@index([userId])
+}
+
+// ───────────────────────────── Payments ─────────────────────────────
+
+enum PaymentKind {
+  SUBSCRIPTION
+  UNLOCK
+}
+
+enum PaymentStatus {
+  PENDING
+  SUCCESS
+  FAILED
+  CANCELLED
+  TIMEOUT
+}
+
+model Payment {
+  id                String        @id @default(cuid())
+  reference         String        @unique // human-friendly, e.g. HV-7Q2K9D
+  userId            String
+  user              User          @relation(fields: [userId], references: [id], onDelete: Cascade)
+  kind              PaymentKind
+  amount            Int
+  phone             String
+  propertyId        String?
+  property          Property?     @relation(fields: [propertyId], references: [id], onDelete: SetNull)
+  status            PaymentStatus @default(PENDING)
+  merchantRequestId String?
+  checkoutRequestId String?       @unique
+  mpesaReceipt      String?       @unique // unique: one receipt can never fulfil two payments
+  resultCode        Int?
+  resultDesc        String?
+  raw               Json?
+  createdAt         DateTime      @default(now())
+  completedAt       DateTime?
+
+  unlock       Unlock?
+  subscription Subscription?
+
+  @@index([userId, createdAt])
+  @@index([status, createdAt])
+  @@index([kind, status])
+}
+
+model Unlock {
+  id         String   @id @default(cuid())
+  userId     String
+  user       User     @relation(fields: [userId], references: [id], onDelete: Cascade)
+  propertyId String
+  property   Property @relation(fields: [propertyId], references: [id], onDelete: Cascade)
+  paymentId  String?  @unique
+  payment    Payment? @relation(fields: [paymentId], references: [id], onDelete: SetNull)
+  createdAt  DateTime @default(now())
+
+  @@unique([userId, propertyId]) // a property is only ever unlocked once per user
+}
+
+model Subscription {
+  id            String        @id @default(cuid())
+  listerId      String
+  lister        ListerProfile @relation(fields: [listerId], references: [id], onDelete: Cascade)
+  paymentId     String?       @unique
+  payment       Payment?      @relation(fields: [paymentId], references: [id], onDelete: SetNull)
+  amount        Int
+  startsAt      DateTime
+  endsAt        DateTime
+  remindersSent Int[]         @default([]) // days-before-expiry reminders already sent (5, 2, 1)
+  expiredNoticeSent Boolean   @default(false)
+  createdAt     DateTime      @default(now())
+
+  @@index([listerId, endsAt])
+  @@index([endsAt])
+}
+
+// ───────────────────────────── Reviews & moderation ─────────────────────────────
+
+enum ReviewStatus {
+  PUBLISHED
+  PENDING
+  HIDDEN
+}
+
+model Review {
+  id         String       @id @default(cuid())
+  propertyId String
+  property   Property     @relation(fields: [propertyId], references: [id], onDelete: Cascade)
+  userId     String
+  user       User         @relation(fields: [userId], references: [id], onDelete: Cascade)
+  rating     Int // 1–5
+  comment    String
+  status     ReviewStatus @default(PUBLISHED)
+  flagged    Boolean      @default(false) // auto-flagged or reported as abusive
+  reply      String?
+  repliedAt  DateTime?
+  createdAt  DateTime     @default(now())
+  updatedAt  DateTime     @updatedAt
+  reports    Report[]
+
+  @@unique([propertyId, userId]) // one review per user per property
+  @@index([status, createdAt])
+}
+
+enum ReportStatus {
+  OPEN
+  RESOLVED
+  DISMISSED
+}
+
+model Report {
+  id         String       @id @default(cuid())
+  reporterId String?
+  reporter   User?        @relation(fields: [reporterId], references: [id], onDelete: SetNull)
+  propertyId String?
+  property   Property?    @relation(fields: [propertyId], references: [id], onDelete: Cascade)
+  reviewId   String?
+  review     Review?      @relation(fields: [reviewId], references: [id], onDelete: Cascade)
+  reason     String
+  details    String?
+  status     ReportStatus @default(OPEN)
+  createdAt  DateTime     @default(now())
+  resolvedAt DateTime?
+
+  @@index([status, createdAt])
+}
+
+/// Enquiries a viewer sends to a lister after unlocking a property.
+model Message {
+  id         String        @id @default(cuid())
+  propertyId String
+  property   Property      @relation(fields: [propertyId], references: [id], onDelete: Cascade)
+  senderId   String
+  sender     User          @relation(fields: [senderId], references: [id], onDelete: Cascade)
+  listerId   String
+  lister     ListerProfile @relation(fields: [listerId], references: [id], onDelete: Cascade)
+  body       String
+  readAt     DateTime?
+  createdAt  DateTime      @default(now())
+
+  @@index([listerId, createdAt])
+}
+
+// ───────────────────────────── Directory ─────────────────────────────
+
+model Company {
+  id          String    @id @default(cuid())
+  name        String
+  slug        String    @unique
+  logoUrl     String?
+  coverUrl    String?
+  description String
+  phone       String?
+  email       String?
+  website     String?
+  address     String?
+  areasServed String[]  @default([])
+  verified    Boolean   @default(false)
+  featured    Boolean   @default(false)
+  foundedYear Int?
+  createdAt   DateTime  @default(now())
+  realtors    Realtor[]
+}
+
+model Realtor {
+  id          String         @id @default(cuid())
+  name        String
+  slug        String         @unique
+  photoUrl    String?
+  bio         String
+  companyId   String?
+  company     Company?       @relation(fields: [companyId], references: [id], onDelete: SetNull)
+  listerId    String?        @unique // linked lister account (shows their listings)
+  lister      ListerProfile? @relation(fields: [listerId], references: [id], onDelete: SetNull)
+  phone       String?
+  email       String?
+  specialties String[]       @default([])
+  areas       String[]       @default([])
+  earbNumber  String?
+  yearsExperience Int?
+  rating      Float          @default(0)
+  ratingCount Int            @default(0)
+  verified    Boolean        @default(false)
+  featured    Boolean        @default(false)
+  createdAt   DateTime       @default(now())
+}
+
+// ───────────────────────────── Ads & content ─────────────────────────────
+
+enum AdPlacement {
+  HOME_HERO
+  SIDEBAR
+  BETWEEN_LISTINGS
+  FOOTER
+}
+
+model Advert {
+  id          String      @id @default(cuid())
+  title       String
+  subtitle    String?
+  imageUrl    String
+  linkUrl     String
+  placement   AdPlacement
+  startsAt    DateTime
+  endsAt      DateTime
+  active      Boolean     @default(true)
+  impressions Int         @default(0)
+  clicks      Int         @default(0)
+  createdAt   DateTime    @default(now())
+
+  @@index([placement, active])
+}
+
+model BlogPost {
+  id          String    @id @default(cuid())
+  slug        String    @unique
+  title       String
+  excerpt     String
+  body        String // light markdown: paragraphs, ## headings, - lists, **bold**
+  coverUrl    String?
+  author      String    @default("HomeVista Editorial")
+  tags        String[]  @default([])
+  published   Boolean   @default(false)
+  publishedAt DateTime?
+  createdAt   DateTime  @default(now())
+  updatedAt   DateTime  @updatedAt
+}
+
+model Faq {
+  id        String  @id @default(cuid())
+  question  String
+  answer    String
+  group     String  @default("General")
+  sortOrder Int     @default(0)
+}
+
+/// Editable legal and static pages (terms, privacy, about).
+model Page {
+  slug      String   @id
+  title     String
+  body      String
+  updatedAt DateTime @updatedAt
+}
+
+model Testimonial {
+  id        String  @id @default(cuid())
+  name      String
+  role      String
+  quote     String
+  avatarUrl String?
+  sortOrder Int     @default(0)
+  active    Boolean @default(true)
+}
+
+/// Key/value system settings: prices, durations, toggles.
+model Setting {
+  key   String @id
+  value String
+}
+
+// ───────────────────────────── Notifications & audit ─────────────────────────────
+
+model Notification {
+  id        String   @id @default(cuid())
+  userId    String
+  user      User     @relation(fields: [userId], references: [id], onDelete: Cascade)
+  title     String
+  body      String
+  link      String?
+  read      Boolean  @default(false)
+  createdAt DateTime @default(now())
+
+  @@index([userId, read, createdAt])
+}
+
+/// Every email/SMS the system sends (or would send, in dev). Useful for support and debugging.
+model OutboundMessage {
+  id        String   @id @default(cuid())
+  channel   String // EMAIL | SMS
+  to        String
+  subject   String?
+  body      String
+  status    String // SENT | LOGGED | FAILED
+  error     String?
+  createdAt DateTime @default(now())
+
+  @@index([createdAt])
+}
+
+model ActivityLog {
+  id        String   @id @default(cuid())
+  userId    String?
+  user      User?    @relation(fields: [userId], references: [id], onDelete: SetNull)
+  action    String
+  target    String?
+  detail    String?
+  ip        String?
+  createdAt DateTime @default(now())
+
+  @@index([createdAt])
+}

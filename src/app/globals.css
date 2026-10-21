@@ -1,0 +1,308 @@
+@import "tailwindcss";
+
+/* ───────────── HomeVista Ke design tokens ─────────────
+   Deep navy base, champagne-gold accents, warm ivory surfaces.
+   Dark mode follows the OS unless the visitor picks a theme (html[data-theme]). */
+
+:root {
+  --bg: #faf7f2;
+  --bg-alt: #f3eee5;
+  --surface: #ffffff;
+  --surface-2: #fbf9f5;
+  --ink: #1b2232;
+  --ink-2: #4a5161;
+  --muted: #7a7f8a;
+  --line: #e8e1d4;
+  --line-strong: #d8cdb9;
+  --navy: #0c1a2e;
+  --navy-2: #15294a;
+  --on-navy: #f5efe3;
+  --gold: #c9a86a;
+  --gold-deep: #9c7a3c; /* text-safe gold on light surfaces */
+  --gold-soft: #f3ead8;
+  --success: #2f7a4f;
+  --success-soft: #e6f2ea;
+  --danger: #b4423a;
+  --danger-soft: #f8e7e5;
+  --warning: #a8701c;
+  --warning-soft: #fbf0dc;
+  --chart-1: #2b5797;
+  --chart-2: #b07a22;
+  --chart-grid: #ece6db;
+  --shadow: 0 1px 2px rgb(12 26 46 / 0.04), 0 8px 24px -8px rgb(12 26 46 / 0.12);
+  --shadow-lg: 0 2px 6px rgb(12 26 46 / 0.06), 0 24px 48px -16px rgb(12 26 46 / 0.22);
+  color-scheme: light;
+}
+
+@media (prefers-color-scheme: dark) {
+  :root:not([data-theme="light"]) {
+    --bg: #0a1322;
+    --bg-alt: #0e192c;
+    --surface: #111f35;
+    --surface-2: #14243d;
+    --ink: #eee8dc;
+    --ink-2: #c3c0b8;
+    --muted: #8f96a3;
+    --line: #22324d;
+    --line-strong: #2f4366;
+    --navy: #060d19;
+    --navy-2: #0d1a2f;
+    --on-navy: #f5efe3;
+    --gold: #d6b97f;
+    --gold-deep: #d6b97f;
+    --gold-soft: #2a2618;
+    --success: #6cc493;
+    --success-soft: #11291d;
+    --danger: #ef8a80;
+    --danger-soft: #3a1714;
+    --warning: #e5b35e;
+    --warning-soft: #33250c;
+    --chart-1: #5b8edb;
+    --chart-2: #bb8b35;
+    --chart-grid: #22324d;
+    --shadow: 0 1px 2px rgb(0 0 0 / 0.3), 0 8px 24px -8px rgb(0 0 0 / 0.5);
+    --shadow-lg: 0 2px 6px rgb(0 0 0 / 0.3), 0 24px 48px -16px rgb(0 0 0 / 0.6);
+    color-scheme: dark;
+  }
+}
+
+:root[data-theme="dark"] {
+  --bg: #0a1322;
+  --bg-alt: #0e192c;
+  --surface: #111f35;
+  --surface-2: #14243d;
+  --ink: #eee8dc;
+  --ink-2: #c3c0b8;
+  --muted: #8f96a3;
+  --line: #22324d;
+  --line-strong: #2f4366;
+  --navy: #060d19;
+  --navy-2: #0d1a2f;
+  --on-navy: #f5efe3;
+  --gold: #d6b97f;
+  --gold-deep: #d6b97f;
+  --gold-soft: #2a2618;
+  --success: #6cc493;
+  --success-soft: #11291d;
+  --danger: #ef8a80;
+  --danger-soft: #3a1714;
+  --warning: #e5b35e;
+  --warning-soft: #33250c;
+  --chart-1: #5b8edb;
+  --chart-2: #bb8b35;
+  --chart-grid: #22324d;
+  --shadow: 0 1px 2px rgb(0 0 0 / 0.3), 0 8px 24px -8px rgb(0 0 0 / 0.5);
+  --shadow-lg: 0 2px 6px rgb(0 0 0 / 0.3), 0 24px 48px -16px rgb(0 0 0 / 0.6);
+  color-scheme: dark;
+}
+
+@theme inline {
+  --color-bg: var(--bg);
+  --color-bg-alt: var(--bg-alt);
+  --color-surface: var(--surface);
+  --color-surface-2: var(--surface-2);
+  --color-ink: var(--ink);
+  --color-ink-2: var(--ink-2);
+  --color-muted: var(--muted);
+  --color-line: var(--line);
+  --color-line-strong: var(--line-strong);
+  --color-navy: var(--navy);
+  --color-navy-2: var(--navy-2);
+  --color-on-navy: var(--on-navy);
+  --color-gold: var(--gold);
+  --color-gold-deep: var(--gold-deep);
+  --color-gold-soft: var(--gold-soft);
+  --color-success: var(--success);
+  --color-success-soft: var(--success-soft);
+  --color-danger: var(--danger);
+  --color-danger-soft: var(--danger-soft);
+  --color-warning: var(--warning);
+  --color-warning-soft: var(--warning-soft);
+  --font-serif: var(--font-playfair), "Cormorant Garamond", Georgia, serif;
+  --font-sans: var(--font-inter), ui-sans-serif, system-ui, sans-serif;
+  --shadow-soft: var(--shadow);
+  --shadow-lift: var(--shadow-lg);
+  --radius-card: 1.25rem;
+}
+
+@layer base {
+html {
+  -webkit-text-size-adjust: 100%;
+  scroll-behavior: smooth;
+}
+
+body {
+  background: var(--bg);
+  color: var(--ink);
+  font-family: var(--font-sans);
+  -webkit-font-smoothing: antialiased;
+  text-rendering: optimizeLegibility;
+}
+
+h1,
+h2,
+h3,
+.font-display {
+  font-family: var(--font-serif);
+  letter-spacing: -0.01em;
+}
+
+::selection {
+  background: var(--gold);
+  color: var(--navy);
+}
+
+:focus-visible {
+  outline: 2px solid var(--gold);
+  outline-offset: 2px;
+  border-radius: 6px;
+}
+
+}
+
+@media (prefers-reduced-motion: reduce) {
+  *,
+  *::before,
+  *::after {
+    animation-duration: 0.01ms !important;
+    transition-duration: 0.01ms !important;
+    scroll-behavior: auto !important;
+  }
+}
+
+/* ───────────── Components ───────────── */
+
+@utility container-x {
+  @apply mx-auto w-full max-w-7xl px-4 sm:px-6 lg:px-8;
+}
+
+@utility eyebrow {
+  @apply text-[11px] font-semibold tracking-[0.22em] uppercase text-gold-deep;
+}
+
+@utility btn {
+  @apply inline-flex items-center justify-center gap-2 rounded-full px-5 py-2.5 text-sm font-medium transition-all duration-200 select-none disabled:pointer-events-none disabled:opacity-50;
+}
+
+@utility btn-primary {
+  @apply btn bg-navy text-on-navy hover:bg-navy-2 shadow-soft hover:shadow-lift;
+}
+
+@utility btn-gold {
+  @apply btn bg-gold text-[#0c1a2e] hover:brightness-105 shadow-soft hover:shadow-lift;
+}
+
+@utility btn-outline {
+  @apply btn border border-line-strong bg-surface text-ink hover:border-gold hover:text-gold-deep;
+}
+
+@utility btn-ghost {
+  @apply btn text-ink-2 hover:bg-bg-alt hover:text-ink;
+}
+
+@utility btn-danger {
+  @apply btn bg-danger text-white hover:brightness-110;
+}
+
+@utility btn-sm {
+  @apply px-3.5 py-1.5 text-xs;
+}
+
+@utility card {
+  @apply rounded-[var(--radius-card)] border border-line bg-surface shadow-soft;
+}
+
+@utility input {
+  @apply w-full rounded-xl border border-line-strong bg-surface px-3.5 py-2.5 text-sm text-ink placeholder:text-muted transition focus:border-gold focus:ring-2 focus:ring-gold/25 focus:outline-none;
+}
+
+@utility label {
+  @apply mb-1.5 block text-xs font-medium tracking-wide text-ink-2;
+}
+
+@utility chip {
+  @apply inline-flex items-center gap-1 rounded-full border border-line bg-surface-2 px-2.5 py-1 text-xs text-ink-2;
+}
+
+@utility link {
+  @apply text-gold-deep underline-offset-4 hover:underline;
+}
+
+@utility table {
+  @apply w-full text-left text-sm;
+}
+
+.table th {
+  @apply border-b border-line px-3 py-2.5 text-[11px] font-semibold tracking-wider text-muted uppercase whitespace-nowrap;
+}
+
+.table td {
+  @apply border-b border-line px-3 py-3 align-top;
+}
+
+.table tr:last-child td {
+  @apply border-b-0;
+}
+
+/* Long-form content (blog, legal pages) */
+.prose-hv {
+  @apply text-[15px] leading-7 text-ink-2;
+}
+.prose-hv h2 {
+  @apply mt-10 mb-3 text-2xl text-ink;
+}
+.prose-hv h3 {
+  @apply mt-8 mb-2 text-xl text-ink;
+}
+.prose-hv p {
+  @apply mb-5;
+}
+.prose-hv ul {
+  @apply mb-5 list-disc space-y-1.5 pl-5;
+}
+.prose-hv ol {
+  @apply mb-5 list-decimal space-y-1.5 pl-5;
+}
+.prose-hv a {
+  @apply text-gold-deep underline underline-offset-4;
+}
+.prose-hv strong {
+  @apply text-ink;
+}
+
+/* Subtle entrance animation */
+@keyframes rise {
+  from {
+    opacity: 0;
+    transform: translateY(14px);
+  }
+  to {
+    opacity: 1;
+    transform: none;
+  }
+}
+.animate-rise {
+  animation: rise 0.7s cubic-bezier(0.2, 0.7, 0.2, 1) both;
+}
+
+/* Leaflet cluster styling to match the brand */
+.hv-cluster {
+  @apply flex items-center justify-center rounded-full border-2 border-white text-xs font-semibold shadow-lg;
+  background: var(--navy);
+  color: var(--gold);
+}
+.hv-pin {
+  @apply rounded-full border border-white px-2 py-0.5 text-[11px] font-semibold whitespace-nowrap shadow-md;
+  background: var(--navy);
+  color: #f5efe3;
+}
+.leaflet-container {
+  font-family: var(--font-sans) !important;
+  background: var(--bg-alt);
+}
+.no-scrollbar::-webkit-scrollbar {
+  display: none;
+}
+.no-scrollbar {
+  scrollbar-width: none;
+}
