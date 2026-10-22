@@ -46,6 +46,7 @@ With `MPESA_MODE=simulate` (the default), the payment modal shows a **simulated 
 | `npm run dev` / `build` / `start` | Next.js |
 | `npm run db:migrate` / `db:deploy` | Prisma migrations (dev / production) |
 | `npm run db:seed` | Reseeds sample data (refuses to run in production) |
+| `npm run db:bootstrap` | Prepares a production database: settings, taxonomy, starter FAQs and legal pages, and the first super admin (`BOOTSTRAP_ADMIN_EMAIL`, `BOOTSTRAP_ADMIN_NAME`, `BOOTSTRAP_ADMIN_PASSWORD`). Never deletes; safe to re-run |
 | `npm run cron:run` | Runs the scheduled jobs once |
 | `npm run smoke` | 95 end-to-end checks against a running server (pages, dashboards, security, the full M-Pesa flow, subscriptions, cron) |
 | `npm run lint` / `typecheck` | ESLint / TypeScript |
@@ -135,7 +136,8 @@ The jobs send subscription reminders 5, 2 and 1 days before expiry, plus an expi
 ## Deployment notes
 
 - **Hosting:** Vercel, Railway, Render or a VPS behind Nginx all work. Use managed Postgres (Neon, Supabase, RDS…) and S3/R2 for files when running more than one instance.
-- **Map tiles:** the public OpenStreetMap tile servers aren't meant for production traffic. Switch the tile URL in `src/components/search/MapView.tsx` and `LocationPicker.tsx` to a provider such as MapTiler, Stadia or Mapbox.
+- **Map tiles:** the public OpenStreetMap tile servers aren't meant for production traffic. Set `NEXT_PUBLIC_MAP_TILE_URL` (and `NEXT_PUBLIC_MAP_ATTRIBUTION`) to a provider such as MapTiler, Stadia or Mapbox.
+- **Payments:** a production build refuses `MPESA_MODE=simulate` (unset counts as simulate) unless `ALLOW_SIMULATED_PAYMENTS=true`.
 - **Sample data:** seed photos are Unsplash placeholders, and the virtual tours are Matterport's public demo models. Company logos fall back to elegant monograms.
 - **Brand details:** the phone number, email and address in `src/lib/constants.ts` are placeholders. Replace them before launch.
 

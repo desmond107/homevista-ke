@@ -1,7 +1,7 @@
 import { NextResponse } from "next/server";
 import { getUser } from "@/lib/auth";
 import { prisma } from "@/lib/db";
-import { mpesaMode, parseCallback, simulatedCallback } from "@/lib/mpesa";
+import { mpesaMode, parseCallback, simulatedCallback, simulatorBlocked } from "@/lib/mpesa";
 import { completePayment, paymentView } from "@/lib/payments";
 
 /**
@@ -9,7 +9,7 @@ import { completePayment, paymentView } from "@/lib/payments";
  * Daraja-shaped callback and feeds it through the exact same completePayment() as the real callback.
  */
 export async function POST(req: Request, { params }: { params: Promise<{ id: string }> }) {
-  if (mpesaMode() !== "simulate") return NextResponse.json({ error: "Not available" }, { status: 404 });
+  if (mpesaMode() !== "simulate" || simulatorBlocked()) return NextResponse.json({ error: "Not available" }, { status: 404 });
   const user = await getUser();
   if (!user) return NextResponse.json({ error: "Unauthorised" }, { status: 401 });
   const { id } = await params;

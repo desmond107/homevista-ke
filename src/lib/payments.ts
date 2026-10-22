@@ -3,7 +3,7 @@ import crypto from "crypto";
 import { Prisma, type Payment, type PaymentStatus } from "@prisma/client";
 import { prisma } from "./db";
 import { getSettings } from "./settings";
-import { mpesaMode, MpesaError, resultMessage, stkPush, stkQuery, type ParsedCallback } from "./mpesa";
+import { mpesaMode, MpesaError, resultMessage, simulatorBlocked, stkPush, stkQuery, type ParsedCallback } from "./mpesa";
 import { publicWhere } from "./listings";
 import { notifyUser } from "./notify";
 import { UserError } from "./errors";
@@ -37,6 +37,10 @@ export function newReference() {
 type InitArgs = { userId: string; kind: "UNLOCK" | "SUBSCRIPTION"; propertyId?: string | null; phone: string };
 
 export async function initiatePayment(args: InitArgs): Promise<{ payment: Payment; reused: boolean }> {
+  if (simulatorBlocked()) {
+    console.error("[mpesa] MPESA_MODE is not set to sandbox/production; refusing payments in a production build");
+    throw new UserError("Payments are temporarily unavailable. Please try again later.");
+  }
   const settings = await getSettings();
   const user = await prisma.user.findUniqueOrThrow({ where: { id: args.userId }, include: { lister: true } });
 

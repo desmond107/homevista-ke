@@ -3,6 +3,7 @@
 import { useEffect, useRef } from "react";
 import "leaflet/dist/leaflet.css";
 import "leaflet.markercluster/dist/MarkerCluster.css";
+import { MAP_TILES } from "@/lib/constants";
 
 export type MapPin = { id: string; slug: string; title: string; price: string; lat: number; lng: number; image?: string; area: string };
 
@@ -22,10 +23,7 @@ export default function MapView({ pins, height = 620 }: { pins: MapPin[]; height
       await import("leaflet.markercluster");
       if (cancelled || !el.current) return;
       map = L.map(el.current, { scrollWheelZoom: false, zoomControl: true }).setView([-1.2864, 36.8172], 7);
-      L.tileLayer("https://{s}.tile.openstreetmap.org/{z}/{x}/{y}.png", {
-        attribution: '&copy; <a href="https://www.openstreetmap.org/copyright">OpenStreetMap</a> contributors',
-        maxZoom: 18,
-      }).addTo(map);
+      L.tileLayer(MAP_TILES.url, { attribution: MAP_TILES.attribution, maxZoom: 18 }).addTo(map);
       const cluster = L.markerClusterGroup({
         showCoverageOnHover: false,
         maxClusterRadius: 48,

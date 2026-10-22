@@ -96,3 +96,10 @@ export const REPORT_REASONS = [
 ];
 
 export const MAX_PROPERTY_IMAGES = 20;
+
+/** Map tiles. The public OpenStreetMap servers are for light use only; set a provider (MapTiler, Stadia…) in production. */
+export const MAP_TILES = {
+  url: process.env.NEXT_PUBLIC_MAP_TILE_URL || "https://{s}.tile.openstreetmap.org/{z}/{x}/{y}.png",
+  attribution:
+    process.env.NEXT_PUBLIC_MAP_ATTRIBUTION || '&copy; <a href="https://www.openstreetmap.org/copyright">OpenStreetMap</a> contributors',
+};

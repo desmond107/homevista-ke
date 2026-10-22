@@ -23,6 +23,14 @@ export function mpesaMode(): MpesaMode {
   return "simulate";
 }
 
+/**
+ * The simulator hands out unlocks and subscriptions for free, so a production build refuses it
+ * unless ALLOW_SIMULATED_PAYMENTS=true (e.g. a private staging deployment).
+ */
+export function simulatorBlocked() {
+  return mpesaMode() === "simulate" && process.env.NODE_ENV === "production" && process.env.ALLOW_SIMULATED_PAYMENTS !== "true";
+}
+
 function baseUrl() {
   return mpesaMode() === "production" ? "https://api.safaricom.co.ke" : "https://sandbox.safaricom.co.ke";
 }

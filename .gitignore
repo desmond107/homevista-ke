@@ -7,3 +7,5 @@ storage/
 *.tsbuildinfo
 next-env.d.ts
 .DS_Store
+.env.vercel
+.env*.local

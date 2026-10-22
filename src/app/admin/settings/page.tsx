@@ -2,7 +2,7 @@ import { CheckCircle2, CircleDashed } from "lucide-react";
 import { requireAdmin } from "@/lib/auth";
 import { prisma } from "@/lib/db";
 import { getSettings } from "@/lib/settings";
-import { mpesaMode } from "@/lib/mpesa";
+import { mpesaMode, simulatorBlocked } from "@/lib/mpesa";
 import { googleEnabled } from "@/lib/google";
 import { timeAgo } from "@/lib/format";
 import { DashHeader } from "@/components/DashShell";
@@ -14,7 +14,7 @@ export default async function SettingsPage() {
   await requireAdmin("settings");
   const [s, outbound] = await Promise.all([getSettings(), prisma.outboundMessage.findMany({ orderBy: { createdAt: "desc" }, take: 15 })]);
   const integrations = [
-    ["M-Pesa Daraja", mpesaMode() === "simulate" ? "Simulator (dev)" : mpesaMode() === "sandbox" ? "Sandbox" : "Live", mpesaMode() === "production"],
+    ["M-Pesa Daraja", mpesaMode() === "simulate" ? (simulatorBlocked() ? "Not configured: payments off" : "Simulator (dev)") : mpesaMode() === "sandbox" ? "Sandbox" : "Live", mpesaMode() === "production"],
     ["Email (Resend)", process.env.RESEND_API_KEY ? "Connected" : "Logging only", !!process.env.RESEND_API_KEY],
     ["SMS (Africa's Talking)", process.env.AT_API_KEY ? `Connected (${process.env.AT_USERNAME})` : "Logging only", !!process.env.AT_API_KEY],
     ["Google sign-in", googleEnabled() ? "Enabled" : "Not configured", googleEnabled()],

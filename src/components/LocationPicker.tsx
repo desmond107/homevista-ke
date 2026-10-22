@@ -2,6 +2,7 @@
 
 import { useEffect, useRef } from "react";
 import "leaflet/dist/leaflet.css";
+import { MAP_TILES } from "@/lib/constants";
 
 /** Click (or drag the pin) to set the exact location. Writes into hidden lat/lng inputs. */
 export default function LocationPicker({ lat, lng, onChange }: { lat: number; lng: number; onChange: (lat: number, lng: number) => void }) {
@@ -17,7 +18,7 @@ export default function LocationPicker({ lat, lng, onChange }: { lat: number; ln
       const L = (await import("leaflet")).default;
       if (cancelled || !el.current || mapRef.current) return;
       const map = L.map(el.current, { scrollWheelZoom: false }).setView([lat, lng], 14);
-      L.tileLayer("https://{s}.tile.openstreetmap.org/{z}/{x}/{y}.png", { attribution: "&copy; OpenStreetMap contributors", maxZoom: 19 }).addTo(map);
+      L.tileLayer(MAP_TILES.url, { attribution: MAP_TILES.attribution, maxZoom: 19 }).addTo(map);
       const icon = L.divIcon({ html: '<div class="hv-pin">📍 Exact location</div>', className: "", iconAnchor: [50, 24] });
       const marker = L.marker([lat, lng], { draggable: true, icon }).addTo(map);
       marker.on("dragend", () => {
