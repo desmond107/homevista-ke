@@ -8,6 +8,9 @@ import { appUrl } from "@/lib/notify";
 import { getSettings } from "@/lib/settings";
 import "./globals.css";
 
+// Every page reads live settings (site notice) from the database, so render on request, not at build time.
+export const dynamic = "force-dynamic";
+
 const playfair = Playfair_Display({ subsets: ["latin"], variable: "--font-playfair", display: "swap" });
 const inter = Inter({ subsets: ["latin"], variable: "--font-inter", display: "swap" });
 

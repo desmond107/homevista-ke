@@ -3,6 +3,8 @@ import { prisma } from "@/lib/db";
 import { publicWhere } from "@/lib/listings";
 import { appUrl } from "@/lib/notify";
 
+// Built on first request (then cached for an hour) so `next build` never needs the database.
+export const dynamic = "force-dynamic";
 export const revalidate = 3600;
 
 export default async function sitemap(): Promise<MetadataRoute.Sitemap> {
