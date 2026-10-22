@@ -2,7 +2,7 @@ import crypto from "crypto";
 import { NextResponse } from "next/server";
 import { runAllJobs } from "@/lib/cron";
 
-/** Hourly jobs: subscription reminders/expiry notices, saved-search alerts, housekeeping.
+/** Daily jobs (06:00 UTC / 09:00 EAT on Vercel Hobby): subscription reminders/expiry notices, saved-search alerts, housekeeping.
  *  Authenticate with `Authorization: Bearer CRON_SECRET` (Vercel Cron) or `?key=CRON_SECRET`. */
 export async function GET(req: Request) {
   const secret = process.env.CRON_SECRET;

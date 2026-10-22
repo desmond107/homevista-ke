@@ -6,7 +6,7 @@ import { dateLabel, plural } from "./format";
 import { buildWhere, parseFilters } from "./search";
 
 /*
- * Scheduled jobs. Run hourly via GET /api/cron?key=CRON_SECRET (Vercel Cron, a server crontab,
+ * Scheduled jobs. Run daily on Vercel Hobby (hourly is better if your plan allows) via GET /api/cron?key=CRON_SECRET (Vercel Cron, a server crontab,
  * or `npm run cron:run`). Every job is idempotent, so running it more often is harmless.
  */
 
