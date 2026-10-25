@@ -45,14 +45,14 @@ async function BlogTab() {
     <>
       <div className="mb-4 flex justify-end"><Link href="/admin/content/blog/new" className="btn-gold"><Plus size={16} /> New article</Link></div>
       <div className="card overflow-x-auto">
-        <table className="table">
+        <table className="table table-stack">
           <thead><tr><th>Title</th><th>Status</th><th>Published</th><th /></tr></thead>
           <tbody>
             {posts.map((p) => (
               <tr key={p.id}>
                 <td><Link href={`/blog/${p.slug}`} className="font-medium text-ink hover:text-gold-deep">{p.title}</Link><span className="block text-xs text-muted">{p.tags.join(" · ")}</span></td>
-                <td>{p.published ? <Pill tone="success">Published</Pill> : <Pill tone="warning">Draft</Pill>}</td>
-                <td className="text-xs">{dateLabel(p.publishedAt)}</td>
+                <td data-label="Status" className="stack-inline">{p.published ? <Pill tone="success">Published</Pill> : <Pill tone="warning">Draft</Pill>}</td>
+                <td data-label="Published" className="stack-inline text-xs">{dateLabel(p.publishedAt)}</td>
                 <td><div className="flex justify-end gap-1.5"><Link href={`/admin/content/blog/${p.id}`} className="btn-outline btn-sm">Edit</Link><ActButton action={deleteContentAction.bind(null, "blog", p.id)} confirm="Delete this article?" className="btn-ghost btn-sm text-danger">Delete</ActButton></div></td>
               </tr>
             ))}

@@ -16,15 +16,15 @@ export default async function AdminCompaniesPage({ searchParams }: { searchParam
       <DashHeader title="Real estate companies" intro="Shown on the public Companies directory." action={<Link href="/admin/companies/new" className="btn-gold"><Plus size={16} /> Add company</Link>} />
       {sp.saved && <p className="mb-4 rounded-xl bg-success-soft px-4 py-3 text-sm text-success">Company saved.</p>}
       <div className="card overflow-x-auto">
-        <table className="table">
+        <table className="table table-stack">
           <thead><tr><th>Company</th><th>Areas served</th><th>Realtors</th><th>Status</th><th /></tr></thead>
           <tbody>
             {companies.map((c) => (
               <tr key={c.id}>
                 <td><div className="flex items-center gap-3"><Avatar name={c.name} src={c.logoUrl} size={36} /><span><Link href={`/companies/${c.slug}`} className="font-medium text-ink hover:text-gold-deep">{c.name}</Link><span className="block text-xs text-muted">{c.website ?? c.email ?? ""}</span></span></div></td>
-                <td className="max-w-xs text-xs text-ink-2">{c.areasServed.join(", ")}</td>
-                <td>{c._count.realtors}</td>
-                <td className="space-x-1">{c.verified ? <Pill tone="gold">Verified</Pill> : <Pill>Unverified</Pill>}{c.featured && <Pill tone="navy">Featured</Pill>}</td>
+                <td data-label="Areas served" className="max-w-xs text-xs text-ink-2">{c.areasServed.join(", ")}</td>
+                <td data-label="Realtors" className="stack-inline">{c._count.realtors}</td>
+                <td data-label="Status" className="stack-inline space-x-1">{c.verified ? <Pill tone="gold">Verified</Pill> : <Pill>Unverified</Pill>}{c.featured && <Pill tone="navy">Featured</Pill>}</td>
                 <td><div className="flex justify-end gap-1.5"><Link href={`/admin/companies/${c.id}`} className="btn-outline btn-sm">Edit</Link><ActButton action={deleteDirectoryAction.bind(null, "company", c.id)} confirm={`Delete ${c.name}?`} className="btn-ghost btn-sm text-danger">Delete</ActButton></div></td>
               </tr>
             ))}

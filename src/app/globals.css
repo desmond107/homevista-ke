@@ -212,6 +212,55 @@ h3,
   @apply border-b-0;
 }
 
+input[type="file"] {
+  max-width: 100%;
+}
+
+/* .table-stack: below the sm breakpoint each row becomes a card. Cells show their data-label
+   as a caption; cells marked .stack-inline sit side by side (short values like counts and pills). */
+@media (max-width: 639.98px) {
+  .table-stack thead {
+    display: none;
+  }
+  .table-stack,
+  .table-stack tbody,
+  .table-stack tr {
+    display: block;
+    width: 100%;
+  }
+  .table-stack tr {
+    @apply border-b border-line px-4 py-3.5;
+  }
+  .table-stack tr:last-child {
+    @apply border-b-0;
+  }
+  .table-stack td {
+    display: block;
+    max-width: none;
+    border: 0;
+    padding: 0.3rem 0;
+    text-align: left;
+  }
+  .table-stack td:empty {
+    display: none;
+  }
+  .table-stack td.stack-inline {
+    display: inline-block;
+    vertical-align: top;
+    margin-right: 1.25rem;
+  }
+  .table-stack td[data-label]::before {
+    content: attr(data-label);
+    @apply mb-0.5 block text-[10px] font-semibold tracking-wider text-muted uppercase;
+  }
+  .table-stack td .justify-end {
+    justify-content: flex-start;
+  }
+  .table-stack td[colspan] {
+    text-align: center;
+  }
+}
+
 /* Long-form content (blog, legal pages) */
 .prose-hv {
   @apply text-[15px] leading-7 text-ink-2;

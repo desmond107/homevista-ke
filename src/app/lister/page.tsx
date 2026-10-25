@@ -71,7 +71,7 @@ export default async function ListerOverview() {
             <h2 className="text-xl">Performance by listing</h2>
             <Link href="/lister/listings" className="link text-sm">Manage</Link>
           </div>
-          <table className="table">
+          <table className="table table-stack">
             <thead>
               <tr>
                 <th>Listing</th>
@@ -88,11 +88,11 @@ export default async function ListerOverview() {
                   <td className="max-w-[260px]">
                     <Link href={`/properties/${l.slug}`} className="block truncate text-ink hover:text-gold-deep">{l.title}</Link>
                   </td>
-                  <td><Pill tone={statusTone(l.status)}>{LISTING_STATUS_LABELS[l.status]}</Pill></td>
-                  <td className="text-right">{l.views.toLocaleString()}</td>
-                  <td className="text-right">{l.unlockCount}</td>
-                  <td className="text-right">{l._count.favourites}</td>
-                  <td className="text-right">{l.ratingCount ? `${l.ratingAvg.toFixed(1)} (${l.ratingCount})` : "—"}</td>
+                  <td data-label="Status" className="stack-inline"><Pill tone={statusTone(l.status)}>{LISTING_STATUS_LABELS[l.status]}</Pill></td>
+                  <td data-label="Views" className="stack-inline text-right">{l.views.toLocaleString()}</td>
+                  <td data-label="Unlocks" className="stack-inline text-right">{l.unlockCount}</td>
+                  <td data-label="Saves" className="stack-inline text-right">{l._count.favourites}</td>
+                  <td data-label="Rating" className="stack-inline text-right">{l.ratingCount ? `${l.ratingAvg.toFixed(1)} (${l.ratingCount})` : "—"}</td>
                 </tr>
               ))}
               {!listings.length && (

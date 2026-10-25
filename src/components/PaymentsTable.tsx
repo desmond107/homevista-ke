@@ -21,7 +21,7 @@ type Row = {
 export function PaymentsTable({ rows, showUser }: { rows: Row[]; showUser?: boolean }) {
   return (
     <div className="card overflow-x-auto">
-      <table className="table">
+      <table className="table table-stack">
         <thead>
           <tr>
             <th>Date</th>
@@ -36,14 +36,14 @@ export function PaymentsTable({ rows, showUser }: { rows: Row[]; showUser?: bool
         <tbody>
           {rows.map((p) => (
             <tr key={p.id}>
-              <td className="whitespace-nowrap text-ink-2">{dateTimeLabel(p.createdAt)}</td>
+              <td data-label="Date" className="stack-inline whitespace-nowrap text-ink-2">{dateTimeLabel(p.createdAt)}</td>
               {showUser && (
-                <td>
+                <td data-label="Customer" className="stack-inline">
                   <span className="block text-ink">{p.user?.name}</span>
                   <span className="block text-xs text-muted">{p.user?.email}</span>
                 </td>
               )}
-              <td className="max-w-xs">
+              <td data-label="Description" className="max-w-xs">
                 <span className="block text-ink">{p.kind === "UNLOCK" ? "Property unlock" : "Lister subscription"}</span>
                 {p.property && (
                   <Link href={`/properties/${p.property.slug}`} className="block truncate text-xs text-muted hover:text-gold-deep">
@@ -52,12 +52,12 @@ export function PaymentsTable({ rows, showUser }: { rows: Row[]; showUser?: bool
                 )}
                 <span className="block text-xs text-muted">Ref {p.reference}</span>
               </td>
-              <td className="font-medium whitespace-nowrap">{kes(p.amount)}</td>
-              <td className="text-xs whitespace-nowrap text-ink-2">
+              <td data-label="Amount" className="stack-inline font-medium whitespace-nowrap">{kes(p.amount)}</td>
+              <td data-label="M-Pesa" className="stack-inline text-xs whitespace-nowrap text-ink-2">
                 {p.mpesaReceipt ?? "—"}
                 <span className="block text-muted">{maskPhone(p.phone)}</span>
               </td>
-              <td>
+              <td data-label="Status" className="stack-inline">
                 <Pill tone={statusTone(p.status)}>{PAYMENT_STATUS_LABELS[p.status]}</Pill>
                 {p.status !== "SUCCESS" && p.resultDesc && <span className="mt-1 block max-w-[200px] text-[11px] text-muted">{p.resultDesc}</span>}
               </td>

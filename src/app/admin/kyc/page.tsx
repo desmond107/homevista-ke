@@ -34,15 +34,15 @@ export default async function KycQueuePage({ searchParams }: { searchParams: Pro
       </div>
       {subs.length ? (
         <div className="card overflow-x-auto">
-          <table className="table">
+          <table className="table table-stack">
             <thead><tr><th>Lister</th><th>Submitted</th><th>Applicant</th><th>Status</th><th /></tr></thead>
             <tbody>
               {subs.map((s) => (
                 <tr key={s.id}>
                   <td><span className="block font-medium text-ink">{s.lister.displayName}</span><span className="text-xs text-muted">{LISTER_TYPE_LABELS[s.lister.type]}</span></td>
-                  <td className="text-xs text-ink-2">{dateTimeLabel(s.createdAt)}<span className="block text-muted">{timeAgo(s.createdAt)}</span></td>
-                  <td className="text-xs text-ink-2">{s.fullName}<span className="block text-muted">{s.idType === "PASSPORT" ? "Passport" : "ID"} {s.idNumber}</span></td>
-                  <td><Pill tone={statusTone(s.status)}>{KYC_LABELS[s.status]}</Pill></td>
+                  <td data-label="Submitted" className="stack-inline text-xs text-ink-2">{dateTimeLabel(s.createdAt)}<span className="block text-muted">{timeAgo(s.createdAt)}</span></td>
+                  <td data-label="Applicant" className="stack-inline text-xs text-ink-2">{s.fullName}<span className="block text-muted">{s.idType === "PASSPORT" ? "Passport" : "ID"} {s.idNumber}</span></td>
+                  <td data-label="Status" className="stack-inline"><Pill tone={statusTone(s.status)}>{KYC_LABELS[s.status]}</Pill></td>
                   <td className="text-right"><Link href={`/admin/kyc/${s.id}`} className="btn-primary btn-sm">Review</Link></td>
                 </tr>
               ))}

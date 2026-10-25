@@ -18,18 +18,18 @@ export default async function ActivityPage({ searchParams }: { searchParams: Pro
   return (
     <>
       <DashHeader title="Audit log" intro="Sign-ins, moderation decisions, KYC document views, exports and settings changes." />
-      <form className="mb-4 flex gap-2"><input name="q" defaultValue={sp.q} placeholder="Filter by action or email (e.g. kyc, login)" className="input !w-80" /><button className="btn-primary">Filter</button></form>
+      <form className="mb-4 flex gap-2"><input name="q" defaultValue={sp.q} placeholder="Filter by action or email (e.g. kyc, login)" className="input min-w-0 flex-1 sm:!w-80 sm:flex-none" /><button className="btn-primary">Filter</button></form>
       <div className="card overflow-x-auto">
-        <table className="table">
+        <table className="table table-stack">
           <thead><tr><th>When</th><th>Who</th><th>Action</th><th>Target / detail</th><th>IP</th></tr></thead>
           <tbody>
             {rows.map((r) => (
               <tr key={r.id}>
-                <td className="text-xs whitespace-nowrap text-ink-2">{dateTimeLabel(r.createdAt)}</td>
-                <td className="text-xs">{r.user ? <><span className="block text-ink">{r.user.name}</span><span className="text-muted">{r.user.email}</span></> : <span className="text-muted">—</span>}</td>
-                <td><code className="rounded bg-bg-alt px-1.5 py-0.5 text-xs">{r.action}</code></td>
-                <td className="max-w-sm text-xs break-all text-ink-2">{r.target}{r.detail ? ` — ${r.detail}` : ""}</td>
-                <td className="text-xs text-muted">{r.ip}</td>
+                <td data-label="When" className="stack-inline text-xs whitespace-nowrap text-ink-2">{dateTimeLabel(r.createdAt)}</td>
+                <td data-label="Who" className="stack-inline text-xs">{r.user ? <><span className="block text-ink">{r.user.name}</span><span className="text-muted">{r.user.email}</span></> : <span className="text-muted">—</span>}</td>
+                <td data-label="Action"><code className="rounded bg-bg-alt px-1.5 py-0.5 text-xs">{r.action}</code></td>
+                <td data-label="Target / detail" className="max-w-sm text-xs break-all text-ink-2">{r.target}{r.detail ? ` — ${r.detail}` : ""}</td>
+                <td data-label="IP" className="text-xs text-muted">{r.ip}</td>
               </tr>
             ))}
           </tbody>

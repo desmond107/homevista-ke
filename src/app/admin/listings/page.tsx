@@ -56,9 +56,9 @@ export default async function AdminListingsPage({ searchParams }: { searchParams
         {tab("DRAFT", "Drafts")}
         {tab("ALL", "All")}
       </div>
-      <form className="mb-4 flex gap-2">
+      <form className="mb-4 flex flex-wrap items-center gap-2">
         <input type="hidden" name="status" value={status} />
-        <input name="q" defaultValue={sp.q} placeholder="Search title or lister…" className="input !w-72" />
+        <input name="q" defaultValue={sp.q} placeholder="Search title or lister…" className="input min-w-0 flex-1 basis-full sm:!w-72 sm:flex-none sm:basis-auto" />
         <label className="flex items-center gap-2 text-sm text-ink-2"><input type="checkbox" name="featured" value="1" defaultChecked={!!sp.featured} className="accent-[var(--navy)]" /> Featured only</label>
         <button className="btn-primary">Search</button>
       </form>

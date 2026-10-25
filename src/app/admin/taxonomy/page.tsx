@@ -16,10 +16,10 @@ function TaxForm({ kind, row, counties, compact }: { kind: Kind; row?: Record<st
       <input type="hidden" name="kind" value={kind} />
       {row && <input type="hidden" name="id" value={String(row.id)} />}
       <div className="flex flex-wrap gap-2">
-        <input name="name" defaultValue={String(v("name"))} placeholder="Name" required className="input !w-48" />
+        <input name="name" defaultValue={String(v("name"))} placeholder="Name" required className="input basis-full sm:!w-48 sm:basis-auto" />
         {(kind === "type" || kind === "amenity") && <input name="icon" defaultValue={String(v("icon"))} placeholder="lucide icon e.g. home" className="input !w-44" title="Any icon name from lucide.dev" />}
         {(kind === "type" || kind === "amenity" || kind === "category") && <input name="sortOrder" type="number" defaultValue={String(v("sortOrder") || 0)} className="input !w-20" title="Sort order" />}
-        {kind === "category" && <input name="description" defaultValue={String(v("description"))} placeholder="Short description" className="input !w-64" />}
+        {kind === "category" && <input name="description" defaultValue={String(v("description"))} placeholder="Short description" className="input basis-full sm:!w-64 sm:basis-auto" />}
         {kind === "category" && <input name="image" type="file" accept="image/jpeg,image/png,image/webp" className="text-xs" title="Collection image" />}
         {(kind === "county" || kind === "town") && (
           <>
@@ -63,24 +63,27 @@ export default async function TaxonomyPage() {
     prisma.county.findMany({ orderBy: { name: "asc" }, include: { towns: { orderBy: { name: "asc" }, include: { _count: { select: { properties: true } } } }, _count: { select: { properties: true } } } }),
   ]);
   const countyOpts = counties.map((c) => ({ id: c.id, name: c.name }));
-  const Row = ({ kind, row, label, count, icon }: { kind: Kind; row: Record<string, unknown>; label: string; count: number; icon?: string }) => (
-    <li className="py-2.5">
+  const Row = ({ kind, row, label, count, icon, nested }: { kind: Kind; row: Record<string, unknown>; label: string; count: number; icon?: string; nested?: boolean }) => {
+    const Tag = nested ? "div" : "li";
+    return (
+    <Tag className="py-2.5">
       <details>
         <summary className="flex cursor-pointer items-center justify-between gap-3 text-sm">
-          <span className="flex items-center gap-2 text-ink">
+          <span className="flex min-w-0 flex-wrap items-center gap-2 text-ink">
             {icon && <DynIcon name={icon} size={16} className="text-gold-deep" />} {label}
             {row.active === false && <Pill tone="warning">Inactive</Pill>}
             {row.popular === true && <Pill tone="gold">Popular</Pill>}
           </span>
-          <span className="text-xs text-muted">{count} listings · edit</span>
+          <span className="shrink-0 text-xs text-muted">{count} listings · edit</span>
         </summary>
         <div className="mt-3 flex flex-wrap items-start gap-2">
           <TaxForm kind={kind} row={row} counties={countyOpts} />
           <ActButton action={deleteTaxonomyAction.bind(null, kind, String(row.id))} confirm={`Delete "${label}"?`} className="btn-ghost btn-sm text-danger">Delete</ActButton>
         </div>
       </details>
-    </li>
-  );
+    </Tag>
+    );
+  };
 
   return (
     <>
@@ -98,7 +101,7 @@ export default async function TaxonomyPage() {
         <Section title="Counties & towns" intro="Coordinates position map pins. Popular counties appear on the homepage and footer." addForm={<div className="space-y-2"><TaxForm kind="county" /><TaxForm kind="town" counties={countyOpts} /></div>}>
           {counties.map((c) => (
             <li key={c.id} className="py-2">
-              <Row kind="county" row={c} label={c.name} count={c._count.properties} />
+              <Row kind="county" row={c} label={c.name} count={c._count.properties} nested />
               <ul className="ml-5 border-l border-line pl-4">
                 {c.towns.map((t) => <Row key={t.id} kind="town" row={t} label={t.name} count={t._count.properties} />)}
               </ul>

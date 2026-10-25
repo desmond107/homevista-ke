@@ -36,7 +36,7 @@ export default async function AdminUsersPage({ searchParams }: { searchParams: P
     <>
       <DashHeader title="Users & listers" intro={`${total.toLocaleString()} accounts`} />
       <form className="mb-4 flex flex-wrap gap-2">
-        <input name="q" defaultValue={sp.q} placeholder="Search name, email, phone, business…" className="input !w-72" />
+        <input name="q" defaultValue={sp.q} placeholder="Search name, email, phone, business…" className="input basis-full sm:!w-72 sm:basis-auto" />
         <select name="role" defaultValue={sp.role ?? ""} className="input !w-40">
           <option value="">All roles</option>
           <option value="USER">Seekers</option>
@@ -52,7 +52,7 @@ export default async function AdminUsersPage({ searchParams }: { searchParams: P
         <button className="btn-primary">Filter</button>
       </form>
       <div className="card overflow-x-auto">
-        <table className="table">
+        <table className="table table-stack">
           <thead>
             <tr>
               <th>User</th>
@@ -73,8 +73,8 @@ export default async function AdminUsersPage({ searchParams }: { searchParams: P
                     <span className="block text-xs text-muted">{u.email}</span>
                     <span className="block text-xs text-muted">{u.phone ? prettyPhone(u.phone) : "no phone"}{u.phoneVerified ? " ✓" : ""} · joined {dateLabel(u.createdAt)}</span>
                   </td>
-                  <td><Pill>{u.role === "USER" ? "Seeker" : u.role === "LISTER" ? "Lister" : u.isSuperAdmin ? "Super admin" : "Staff admin"}</Pill></td>
-                  <td className="text-xs">
+                  <td data-label="Role" className="stack-inline"><Pill>{u.role === "USER" ? "Seeker" : u.role === "LISTER" ? "Lister" : u.isSuperAdmin ? "Super admin" : "Staff admin"}</Pill></td>
+                  <td data-label="Lister" className="text-xs">
                     {u.lister ? (
                       <div className="space-y-1">
                         <Link href={`/listers/${u.lister.slug}`} className="flex items-center gap-1 text-sm text-ink hover:text-gold-deep">
@@ -90,8 +90,8 @@ export default async function AdminUsersPage({ searchParams }: { searchParams: P
                       <span className="text-muted">—</span>
                     )}
                   </td>
-                  <td className="text-xs text-ink-2">{u._count.unlocks} unlocks<br />{u._count.payments} payments</td>
-                  <td>
+                  <td data-label="Activity" className="stack-inline text-xs text-ink-2">{u._count.unlocks} unlocks<br />{u._count.payments} payments</td>
+                  <td data-label="Status" className="stack-inline">
                     <Pill tone={statusTone(u.status)}>{u.status.toLowerCase()}</Pill>
                     {u.statusReason && <span className="mt-1 block max-w-[160px] text-[11px] text-muted">{u.statusReason}</span>}
                   </td>

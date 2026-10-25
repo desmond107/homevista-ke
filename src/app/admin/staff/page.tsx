@@ -12,7 +12,7 @@ const PERMS = (Object.keys(ADMIN_PERMISSIONS) as AdminPermission[]).filter((p) =
 function PermForm({ email, current }: { email?: string; current?: string[] }) {
   return (
     <ActionForm action={saveStaffAction} className="space-y-3" resetOnSuccess={!email}>
-      {email ? <input type="hidden" name="email" value={email} /> : <input name="email" type="email" placeholder="Their account email" required className="input !w-72" />}
+      {email ? <input type="hidden" name="email" value={email} /> : <input name="email" type="email" placeholder="Their account email" required className="input sm:!w-72" />}
       <div className="grid gap-1.5 sm:grid-cols-2">
         {PERMS.map((p) => (
           <label key={p} className="flex items-center gap-2 text-sm text-ink-2">

@@ -42,7 +42,7 @@ export default async function AdminPaymentsPage({ searchParams }: { searchParams
         <StatCard label="Active subscriptions now" value={activeSubs} />
       </div>
       <form className="mb-4 flex flex-wrap gap-2">
-        <input name="q" defaultValue={sp.q} placeholder="Ref, M-Pesa code, phone, email" className="input !w-60" />
+        <input name="q" defaultValue={sp.q} placeholder="Ref, M-Pesa code, phone, email" className="input basis-full sm:!w-60 sm:basis-auto" />
         <select name="kind" defaultValue={sp.kind ?? ""} className="input !w-40">
           <option value="">All types</option>
           <option value="UNLOCK">Unlocks</option>
