@@ -2,7 +2,7 @@
 
 /* ───────────── HomeVista Ke design tokens ─────────────
    Deep navy base, champagne-gold accents, warm ivory surfaces.
-   Dark mode follows the OS unless the visitor picks a theme (html[data-theme]). */
+   Light is the default; dark mode applies only when the visitor picks it (html[data-theme="dark"]). */
 
 :root {
   --bg: #faf7f2;
@@ -32,38 +32,6 @@
   --shadow: 0 1px 2px rgb(12 26 46 / 0.04), 0 8px 24px -8px rgb(12 26 46 / 0.12);
   --shadow-lg: 0 2px 6px rgb(12 26 46 / 0.06), 0 24px 48px -16px rgb(12 26 46 / 0.22);
   color-scheme: light;
-}
-
-@media (prefers-color-scheme: dark) {
-  :root:not([data-theme="light"]) {
-    --bg: #0a1322;
-    --bg-alt: #0e192c;
-    --surface: #111f35;
-    --surface-2: #14243d;
-    --ink: #eee8dc;
-    --ink-2: #c3c0b8;
-    --muted: #8f96a3;
-    --line: #22324d;
-    --line-strong: #2f4366;
-    --navy: #060d19;
-    --navy-2: #0d1a2f;
-    --on-navy: #f5efe3;
-    --gold: #d6b97f;
-    --gold-deep: #d6b97f;
-    --gold-soft: #2a2618;
-    --success: #6cc493;
-    --success-soft: #11291d;
-    --danger: #ef8a80;
-    --danger-soft: #3a1714;
-    --warning: #e5b35e;
-    --warning-soft: #33250c;
-    --chart-1: #5b8edb;
-    --chart-2: #bb8b35;
-    --chart-grid: #22324d;
-    --shadow: 0 1px 2px rgb(0 0 0 / 0.3), 0 8px 24px -8px rgb(0 0 0 / 0.5);
-    --shadow-lg: 0 2px 6px rgb(0 0 0 / 0.3), 0 24px 48px -16px rgb(0 0 0 / 0.6);
-    color-scheme: dark;
-  }
 }
 
 :root[data-theme="dark"] {

@@ -42,7 +42,7 @@ export function HeroSearch({ counties, types }: { counties: LocationOption[]; ty
 
   return (
     <form onSubmit={submit} className="w-full max-w-4xl" role="search" aria-label="Find a property">
-      <div role="tablist" aria-label="Purpose" className="mb-3 inline-flex gap-1 rounded-full bg-white/10 p-1 backdrop-blur-md">
+      <div role="tablist" aria-label="Purpose" className="mb-3 inline-flex max-w-full gap-1 overflow-x-auto rounded-full border border-white/15 bg-navy/70 p-1 backdrop-blur-md">
         {(Object.keys(PURPOSE_LABELS) as PurposeKey[]).map((k) => (
           <button
             key={k}
@@ -54,16 +54,16 @@ export function HeroSearch({ counties, types }: { counties: LocationOption[]; ty
               setMin("");
               setMax("");
             }}
-            className={cx("rounded-full px-3.5 py-1.5 text-xs font-medium transition sm:px-4 sm:text-sm", purpose === k ? "bg-gold text-[#0c1a2e]" : "text-white/85 hover:text-white")}
+            className={cx("shrink-0 rounded-full px-3 py-2 text-[13px] font-semibold transition sm:px-5 sm:text-sm", purpose === k ? "bg-gold text-[#0c1a2e] shadow-sm" : "text-white hover:bg-white/10")}
           >
             {PURPOSE_LABELS[k]}
           </button>
         ))}
       </div>
-      <div className="grid gap-2 rounded-3xl bg-surface p-2.5 shadow-lift sm:grid-cols-2 lg:grid-cols-[1.4fr_1fr_1.2fr_auto] lg:rounded-full lg:p-2">
-        <label className="flex flex-col rounded-2xl px-4 py-2 transition hover:bg-bg-alt lg:rounded-full">
-          <span className="text-[10px] font-semibold tracking-[0.18em] text-muted uppercase">Location</span>
-          <select value={loc} onChange={(e) => setLoc(e.target.value)} className="-ml-1 w-full bg-transparent text-sm text-ink outline-none">
+      <div className="grid gap-2 rounded-3xl bg-surface p-2.5 shadow-lift ring-1 ring-black/5 sm:grid-cols-2 lg:grid-cols-[1.4fr_1fr_1.2fr_auto] lg:rounded-full lg:p-2">
+        <label className="flex min-w-0 flex-col rounded-2xl px-4 py-2 transition hover:bg-bg-alt lg:rounded-full">
+          <span className="text-[11px] font-semibold tracking-[0.14em] text-ink-2 uppercase">Location</span>
+          <select value={loc} onChange={(e) => setLoc(e.target.value)} className="-ml-1 w-full bg-transparent text-[15px] font-medium text-ink outline-none">
             <option value="">All of Kenya</option>
             {counties.map((c) => (
               <optgroup key={c.slug} label={c.name}>
@@ -77,9 +77,9 @@ export function HeroSearch({ counties, types }: { counties: LocationOption[]; ty
             ))}
           </select>
         </label>
-        <label className="flex flex-col rounded-2xl px-4 py-2 transition hover:bg-bg-alt lg:rounded-full lg:border-l lg:border-line">
-          <span className="text-[10px] font-semibold tracking-[0.18em] text-muted uppercase">Property type</span>
-          <select value={type} onChange={(e) => setType(e.target.value)} className="-ml-1 w-full bg-transparent text-sm text-ink outline-none">
+        <label className="flex min-w-0 flex-col rounded-2xl px-4 py-2 transition hover:bg-bg-alt lg:rounded-full lg:border-l lg:border-line">
+          <span className="text-[11px] font-semibold tracking-[0.14em] text-ink-2 uppercase">Property type</span>
+          <select value={type} onChange={(e) => setType(e.target.value)} className="-ml-1 w-full bg-transparent text-[15px] font-medium text-ink outline-none">
             <option value="">Any type</option>
             {types.map((t) => (
               <option key={t.slug} value={t.slug}>
@@ -88,10 +88,10 @@ export function HeroSearch({ counties, types }: { counties: LocationOption[]; ty
             ))}
           </select>
         </label>
-        <div className="flex flex-col rounded-2xl px-4 py-2 transition hover:bg-bg-alt sm:col-span-2 lg:col-span-1 lg:rounded-full lg:border-l lg:border-line">
-          <span className="text-[10px] font-semibold tracking-[0.18em] text-muted uppercase">Price range (KSh)</span>
+        <div className="flex min-w-0 flex-col rounded-2xl px-4 py-2 transition hover:bg-bg-alt sm:col-span-2 lg:col-span-1 lg:rounded-full lg:border-l lg:border-line">
+          <span className="text-[11px] font-semibold tracking-[0.14em] text-ink-2 uppercase">Price range (KSh)</span>
           <div className="flex items-center gap-1">
-            <select aria-label="Minimum price" value={min} onChange={(e) => setMin(e.target.value)} className="-ml-1 w-full bg-transparent text-sm text-ink outline-none">
+            <select aria-label="Minimum price" value={min} onChange={(e) => setMin(e.target.value)} className="-ml-1 w-full bg-transparent text-[15px] font-medium text-ink outline-none">
               <option value="">No min</option>
               {presets.map((p) => (
                 <option key={p} value={p}>
@@ -100,7 +100,7 @@ export function HeroSearch({ counties, types }: { counties: LocationOption[]; ty
               ))}
             </select>
             <span className="text-muted">–</span>
-            <select aria-label="Maximum price" value={max} onChange={(e) => setMax(e.target.value)} className="w-full bg-transparent text-sm text-ink outline-none">
+            <select aria-label="Maximum price" value={max} onChange={(e) => setMax(e.target.value)} className="w-full bg-transparent text-[15px] font-medium text-ink outline-none">
               <option value="">No max</option>
               {presets.map((p) => (
                 <option key={p} value={p}>
@@ -110,8 +110,8 @@ export function HeroSearch({ counties, types }: { counties: LocationOption[]; ty
             </select>
           </div>
         </div>
-        <button type="submit" className="btn-gold h-12 w-full !rounded-2xl sm:col-span-2 lg:col-span-1 lg:h-auto lg:w-auto lg:!rounded-full lg:px-7">
-          <Search size={18} /> Search
+        <button type="submit" className="btn-gold h-12 w-full !rounded-2xl text-base font-semibold sm:col-span-2 lg:col-span-1 lg:h-auto lg:w-auto lg:!rounded-full lg:px-7">
+          <Search size={18} /> Search homes
         </button>
       </div>
     </form>

@@ -37,17 +37,21 @@ export default async function HomePage() {
     <>
       {/* ── Hero */}
       <section className="relative isolate overflow-hidden bg-navy">
-        <Image src={HERO} alt="A modern luxury home with pool at dusk" fill priority sizes="100vw" className="-z-10 object-cover opacity-60" />
-        <div className="absolute inset-0 -z-10 bg-gradient-to-b from-navy/70 via-navy/40 to-navy" />
+        <Image src={HERO} alt="A modern luxury home with pool at dusk" fill priority sizes="100vw" className="-z-10 object-cover" />
+        {/* Darker behind the text (left and bottom), clearer photo on the right. */}
+        <div className="absolute inset-0 -z-10 bg-gradient-to-r from-navy/95 via-navy/75 to-navy/30" />
+        <div className="absolute inset-0 -z-10 bg-gradient-to-t from-navy via-transparent to-navy/40" />
         <div className="container-x flex min-h-[640px] flex-col justify-center pt-20 pb-16 sm:min-h-[700px]">
-          <p className="animate-rise mb-4 text-[11px] font-semibold tracking-[0.28em] text-gold uppercase">Kenya&apos;s premium property marketplace</p>
-          <h1 className="animate-rise max-w-3xl text-[44px] leading-[1.05] text-white [animation-delay:80ms] sm:text-6xl lg:text-7xl">
+          <p className="animate-rise mb-5 inline-flex w-fit items-center gap-2 rounded-full border border-gold/40 bg-navy/60 px-3.5 py-1.5 text-[10px] font-semibold tracking-[0.12em] text-gold uppercase backdrop-blur-sm sm:text-[11px] sm:tracking-[0.22em]">
+            <BadgeCheck size={14} /> Kenya&apos;s verified property marketplace
+          </p>
+          <h1 className="animate-rise max-w-3xl text-[44px] leading-[1.05] text-white drop-shadow-[0_2px_12px_rgb(0_0_0/0.35)] [animation-delay:80ms] sm:text-6xl lg:text-7xl">
             Find Your Vista.
             <br />
             <span className="text-gold italic">Find Your Home.</span>
           </h1>
-          <p className="animate-rise mt-5 max-w-xl text-base leading-relaxed text-white/80 [animation-delay:160ms] sm:text-lg">
-            Handpicked homes, apartments, land and commercial spaces across Kenya — from verified landlords, agents and developers.
+          <p className="animate-rise mt-5 max-w-xl text-base leading-relaxed text-white/95 [animation-delay:160ms] sm:text-xl">
+            Homes, apartments, land and commercial spaces across Kenya, listed by verified landlords, agents and developers.
           </p>
           <div className="animate-rise mt-9 [animation-delay:240ms]">
             <HeroSearch
@@ -61,9 +65,9 @@ export default async function HomePage() {
               [verifiedCount.toLocaleString(), "Verified listers"],
               [countyCount.toLocaleString(), "Counties covered"],
             ].map(([v, l]) => (
-              <div key={l} className="border-l border-gold/40 pl-4">
-                <dt className="text-xs text-white/60">{l}</dt>
-                <dd className="font-serif text-3xl text-white">{v}</dd>
+              <div key={l} className="border-l-2 border-gold/70 pl-4">
+                <dt className="text-xs font-medium text-white/85 sm:text-sm">{l}</dt>
+                <dd className="font-serif text-3xl text-white sm:text-4xl">{v}</dd>
               </div>
             ))}
           </dl>
